@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spend a Billionaire's Money — Original Game</title>
+  <style>
+    :root{
+      --bg: #07111f;
+      --panel: rgba(255,255,255,.08);
+      --panel-2: rgba(255,255,255,.12);
+      --text: #edf4ff;
+      --muted: #a9b8d6;
+      --accent: #7c5cff;
+      --accent-2: #19c37d;
+      --danger: #ff5b7f;
+      --warning: #ffb454;
+      --shadow: 0 18px 50px rgba(0,0,0,.28);
+      --radius: 20px;
+      --card-radius: 18px;
+      --border: 1px solid rgba(255,255,255,.12);
+      --max: 1240px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(124,92,255,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(25,195,125,.12), transparent 26%),
+        linear-gradient(180deg, #081321 0%, #091523 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100%;
+    }
+
+    a { color: inherit; }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 40px 0 20px;
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .hero-card::before{
+      content: "";
+      position: absolute;
+      inset: -25% auto auto -10%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(124,92,255,.25), transparent 62%);
+      z-index: -1;
+    }
+
+    .hero-left, .hero-right {
+      padding: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: var(--border);
+      color: #d7e3ff;
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: .96;
+      margin: 16px 0 12px;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.1rem);
+      line-height: 1.65;
+      max-width: 62ch;
+      margin-bottom: 24px;
+    }
+
+    .tycoon-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tycoon-btn {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      min-width: 170px;
+      cursor: pointer;
+      transition: .22s ease;
+      text-align: left;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .tycoon-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.1);
+    }
+
+    .tycoon-btn.active {
+      background: linear-gradient(180deg, rgba(124,92,255,.32), rgba(124,92,255,.18));
+      border-color: rgba(124,92,255,.5);
+      box-shadow: 0 12px 30px rgba(124,92,255,.18);
+    }
+
+    .tycoon-name {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .tycoon-worth {
+      color: #c9d7f5;
+      font-size: 14px;
+    }
+
+    .profile {
+      height: 100%;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)),
+        radial-gradient(circle at 20% 15%, rgba(25,195,125,.18), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(124,92,255,.22), transparent 32%);
+      border: var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 280px;
+    }
+
+    .avatar {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 48px;
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 2px 14px rgba(255,255,255,.05), 0 12px 30px rgba(0,0,0,.18);
+      margin-bottom: 18px;
+    }
+
+    .profile h2 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      letter-spacing: -0.03em;
+    }
+
+    .profile p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: .97rem;
+    }
+
+    .sticky-budget {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      padding: 18px 0 12px;
+    }
+
+    .budget-card {
+      background: rgba(8, 17, 31, .76);
+      backdrop-filter: blur(18px);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .budget-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .budget-figure {
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      margin: 0;
+    }
+
+    .budget-label {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: .95rem;
+    }
+
+    .budget-stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      min-width: 140px;
+      background: rgba(255,255,255,.05);
+      border: var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat strong {
+      font-size: 1rem;
+    }
+
+    .progress-wrap {
+      background: rgba(255,255,255,.06);
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background:
+        linear-gradient(90deg, var(--accent), #9e83ff 35%, #b59fff 55%, var(--accent-2));
+      border-radius: inherit;
+      transition: width .28s ease;
+      box-shadow: 0 0 22px rgba(124,92,255,.3);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 20px;
+      padding: 18px 0 40px;
+      align-items: start;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .item-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: var(--border);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .item-card:hover {
+      transform: translateY(-4px);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    }
+
+    .item-top {
+      padding: 18px 18px 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .item-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: var(--border);
+      flex: 0 0 auto;
+    }
+
+    .qty-pill {
+      min-width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(124,92,255,.18);
+      border: 1px solid rgba(124,92,255,.32);
+      font-weight: 800;
+      color: #f5f2ff;
+    }
+
+    .item-body {
+      padding: 0 18px 16px;
+    }
+
+    .item-name {
+      margin: 4px 0 6px;
+      font-size: 1.1rem;
+      letter-spacing: -.02em;
+    }
+
+    .item-desc {
+      color: var(--muted);
+      margin: 0 0 14px;
+      font-size: .94rem;
+      line-height: 1.55;
+      min-height: 44px;
+    }
+
+    .price {
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -.03em;
+      margin-bottom: 14px;
+      color: #fff0c3;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 50px 1fr 50px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: .95rem;
+      transition: .18s ease;
+      color: white;
+    }
+
+    .btn-main {
+      background: linear-gradient(180deg, var(--accent-2), #0da366);
+      box-shadow: 0 10px 20px rgba(25,195,125,.18);
+    }
+
+    .btn-main:hover { transform: translateY(-1px); }
+    .btn-main:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, #ff7a98, var(--danger));
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,.08);
+      border: var(--border);
+    }
+
+    .btn-icon {
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      padding: 0;
+      height: 48px;
+    }
+
+    .receipt {
+      position: sticky;
+      top: 124px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .receipt-header {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .receipt-header h3 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+      letter-spacing: -.02em;
+    }
+
+    .receipt-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .93rem;
+      line-height: 1.45;
+    }
+
+    .receipt-body {
+      max-height: 480px;
+      overflow: auto;
+      padding: 10px 12px;
+    }
+
+    .empty-state {
+      padding: 18px 10px 8px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+      font-size: .95rem;
+    }
+
+    .line-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .line-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .line-item small {
+      color: var(--muted);
+    }
+
+    .line-total {
+      text-align: right;
+      font-weight: 800;
+      color: #ffe59d;
+    }
+
+    .receipt-footer {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .footer-row strong {
+      color: var(--text);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 40;
+      max-width: 360px;
+      background: rgba(8,17,31,.92);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 16px;
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .22s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .banner {
+      margin: 14px 0 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, rgba(255,180,84,.15), rgba(255,91,127,.15));
+      border: 1px solid rgba(255,180,84,.22);
+      color: #ffeac1;
+      display: none;
+    }
+
+    .banner.show { display: block; }
+
+    .footer-note {
+      padding: 8px 0 36px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .92rem;
+    }
+
+    .money-rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 50;
+    }
+
+    .bill {
+      position: absolute;
+      top: -40px;
+      font-size: 24px;
+      animation: fall linear forwards;
+      opacity: .9;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 1120px){
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .layout { grid-template-columns: 1fr; }
+      .receipt { position: static; }
+    }
+
+    @media (max-width: 860px){
+      .hero-card { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px){
+      .grid { grid-template-columns: 1fr; }
+      .hero-left, .hero-right { padding: 20px; }
+      .budget-card { padding: 16px; }
+      .budget-top { align-items: flex-start; }
+      .budget-stats { width: 100%; }
+      .stat { flex: 1 1 120px; }
+      .controls { grid-template-columns: 48px 1fr 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="money-rain" id="moneyRain"></div>
+
+  <header class="hero">
+    <div class="container">
+      <section class="hero-card">
+        <div class="hero-left">
+          <div class="eyebrow">💸 Original browser game • standalone single file</div>
+          <h1>Spend a billionaire’s money.</h1>
+          <p class="subtitle">
+            Pick a fictional tycoon, buy absurdly expensive things, and see how fast your fortune disappears.
+            This is an original mini-game built from scratch with plain HTML, CSS, and JavaScript.
+          </p>
+
+          <div class="tycoon-row" id="tycoonRow"></div>
+
+          <div class="banner" id="warningBanner"></div>
+        </div>
+
+        <div class="hero-right">
+          <div class="profile">
+            <div>
+              <div class="avatar" id="avatar">🛰️</div>
+              <h2 id="profileName">Astra Vale</h2>
+              <p id="profileBio">
+                A speculative aerospace, robotics, and energy mogul with a taste for moonshots and dramatic spending.
+              </p>
+            </div>
+            <div>
+              <div class="eyebrow" id="profileWorth">Net worth: $100,000,000,000</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <section class="sticky-budget">
+    <div class="container">
+      <div class="budget-card">
+        <div class="budget-top">
+          <div>
+            <div class="budget-figure" id="remainingDisplay">$100,000,000,000</div>
+            <div class="budget-label">Remaining budget</div>
+          </div>
+
+          <div class="budget-stats">
+            <div class="stat">
+              <small>Spent</small>
+              <strong id="spentDisplay">$0</strong>
+            </div>
+            <div class="stat">
+              <small>Items bought</small>
+              <strong id="countDisplay">0</strong>
+            </div>
+            <div class="stat">
+              <small>Budget used</small>
+              <strong id="percentDisplay">0.00%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrap" aria-label="Budget used progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="layout">
+      <section class="grid" id="shopGrid"></section>
+
+      <aside class="receipt">
+        <div class="receipt-header">
+          <h3>Purchase receipt</h3>
+          <p>Everything you buy appears here. Try to spend the entire fortune… if you can.</p>
+        </div>
+
+        <div class="receipt-body" id="receiptBody">
+          <div class="empty-state">
+            Nothing purchased yet.<br />
+            Start clicking <strong>Buy</strong> on something wildly unnecessary.
+          </div>
+        </div>
+
+        <div class="receipt-footer">
+          <div class="footer-row">
+            <span>Total spent</span>
+            <strong id="footerSpent">$0</strong>
+          </div>
+          <div class="footer-row">
+            <span>Remaining</span>
+            <strong id="footerRemaining">$100,000,000,000</strong>
+          </div>
+          <div class="footer-actions">
+            <button class="btn btn-ghost" id="randomBuyBtn">Random Buy</button>
+            <button class="btn btn-danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer-note">
+      Built as an original single-file demo. Edit the arrays in the JavaScript section to add more tycoons or items.
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const tycoons = [
+      {
+        id: "astra",
+        name: "Astra Vale",
+        emoji: "🛰️",
+        worth: 100_000_000_000,
+        bio: "A speculative aerospace, robotics, and energy mogul with a taste for moonshots and dramatic spending."
+      },
+      {
+        id: "magnus",
+        name: "Magnus Reef",
+        emoji: "🌊",
+        worth: 185_000_000_000,
+        bio: "A shipping, biotech, and ocean-infrastructure billionaire who buys islands like other people buy snacks."
+      },
+      {
+        id: "selene",
+        name: "Selene Quill",
+        emoji: "📡",
+        worth: 310_000_000_000,
+        bio: "A media-cloud AI titan whose companies own satellites, studios, chips, and an alarming amount of server racks."
+      }
+    ];
+
+    const items = [
+      { id: 1, name: "Coffee", icon: "☕", price: 5, desc: "One tiny luxury to start your empire of poor decisions." },
+      { id: 2, name: "Sneakers", icon: "👟", price: 120, desc: "Comfortable enough for walking straight into reckless spending." },
+      { id: 3, name: "Gaming Console", icon: "🎮", price: 499, desc: "A bargain, compared with what comes next." },
+      { id: 4, name: "Drone", icon: "🛸", price: 1_500, desc: "Perfect for aerial selfies over your future superyacht." },
+      { id: 5, name: "Designer Sofa", icon: "🛋️", price: 8_000, desc: "For lounging while advisors beg you to diversify." },
+      { id: 6, name: "Motorbike", icon: "🏍️", price: 22_000, desc: "Fast, loud, and fiscally questionable." },
+      { id: 7, name: "Tiny Home", icon: "🏡", price: 85_000, desc: "Surprisingly affordable in billionaire terms." },
+      { id: 8, name: "Luxury Watch", icon: "⌚", price: 250_000, desc: "Tells the time, not the wisdom of the purchase." },
+      { id: 9, name: "Sports Car", icon: "🏎️", price: 1_800_000, desc: "Extremely efficient at turning money into engine noise." },
+      { id: 10, name: "Penthouse", icon: "🏙️", price: 18_000_000, desc: "A modest place with panoramic skyline envy." },
+      { id: 11, name: "Private Jet", icon: "✈️", price: 65_000_000, desc: "Avoid lines at airports by creating larger bills elsewhere." },
+      { id: 12, name: "Superyacht", icon: "🛥️", price: 320_000_000, desc: "The classic floating monument to excess." },
+      { id: 13, name: "Space Tourism Seat", icon: "🚀", price: 450_000, desc: "A brief trip upward, a permanent drop in cash." },
+      { id: 14, name: "Downtown Skyscraper", icon: "🏢", price: 850_000_000, desc: "A vertical reminder that you had options." },
+      { id: 15, name: "Island", icon: "🏝️", price: 1_700_000_000, desc: "Privacy, beaches, and expensive logistics included." },
+      { id: 16, name: "Rocket Launch", icon: "🧨", price: 90_000_000, desc: "Light money on fire, but with telemetry." },
+      { id: 17, name: "Movie Studio", icon: "🎬", price: 4_200_000_000, desc: "Buy a dream factory and greenlight a trilogy." },
+      { id: 18, name: "Satellite Network", icon: "🛰️", price: 12_500_000_000, desc: "Blanket the planet in connectivity and invoices." },
+      { id: 19, name: "Formula Racing Team", icon: "🏁", price: 2_300_000_000, desc: "Go fast, spend faster." },
+      { id: 20, name: "Lunar Habitat Prototype", icon: "🌕", price: 28_000_000_000, desc: "Real estate for people who find Earth too crowded." },
+      { id: 21, name: "AI Data Center Campus", icon: "💻", price: 16_000_000_000, desc: "A monument of chips, cables, cooling, and capital." },
+      { id: 22, name: "Fusion Research Lab", icon: "⚛️", price: 9_500_000_000, desc: "Scientifically noble, financially dramatic." },
+      { id: 23, name: "Global Media Network", icon: "📺", price: 33_000_000_000, desc: "Buy headlines, satellites, and opinionated anchors." },
+      { id: 24, name: "Mars Colony Seed Fund", icon: "🪐", price: 75_000_000_000, desc: "The most expensive backup plan imaginable." }
+    ];
+
+    let currentTycoon = tycoons[0];
+    let cart = {};
+    let toastTimer = null;
+
+    const tycoonRow = document.getElementById("tycoonRow");
+    const shopGrid = document.getElementById("shopGrid");
+    const receiptBody = document.getElementById("receiptBody");
+    const remainingDisplay = document.getElementById("remainingDisplay");
+    const spentDisplay = document.getElementById("spentDisplay");
+    const countDisplay = document.getElementById("countDisplay");
+    const percentDisplay = document.getElementById("percentDisplay");
+    const footerSpent = document.getElementById("footerSpent");
+    const footerRemaining = document.getElementById("footerRemaining");
+    const progressBar = document.getElementById("progressBar");
+    const warningBanner = document.getElementById("warningBanner");
+    const profileName = document.getElementById("profileName");
+    const profileBio = document.getElementById("profileBio");
+    const profileWorth = document.getElementById("profileWorth");
+    const avatar = document.getElementById("avatar");
+    const toast = document.getElementById("toast");
+
+    function fmt(n){
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(n);
+    }
+
+    function getSpent(){
+      return items.reduce((sum, item) => sum + (cart[item.id] || 0) * item.price, 0);
+    }
+
+    function getRemaining(){
+      return Math.max(0, currentTycoon.worth - getSpent());
+    }
+
+    function getCount(){
+      return Object.values(cart).reduce((a,b)=>a+b,0);
+    }
+
+    function showToast(message){
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function moneyRain(){
+      const wrap = document.getElementById("moneyRain");
+      for(let i = 0; i < 18; i++){
+        const el = document.createElement("div");
+        el.className = "bill";
+        el.textContent = ["💸","💵","🤑"][Math.floor(Math.random()*3)];
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.animationDuration = (3 + Math.random() * 2.8) + "s";
+        el.style.transform = `translateY(0) rotate(${Math.random()*160}deg)`;
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 6500);
+      }
+    }
+
+    function canBuy(item){
+      return getRemaining() >= item.price;
+    }
+
+    function buyItem(itemId){
+      const item = items.find(i => i.id === itemId);
+      if(!item) return;
+      if(!canBuy(item)){
+        warningBanner.textContent = `Not enough cash left for ${item.name}. Try selling something first.`;
+        warningBanner.classList.add("show");
+        showToast("Budget exceeded.");
+        return;
+      }
+      warningBanner.classList.remove("show");
+      cart[itemId] = (cart[itemId] || 0) + 1;
+      render();
+    }
+
+    function sellItem(itemId){
+      if(!cart[itemId]) return;
+      cart[itemId]--;
+      if(cart[itemId] <= 0) delete cart[itemId];
+      warningBanner.classList.remove("show");
+      render();
+    }
+
+    function resetCart(announce = true){
+      cart = {};
+      render();
+      if(announce) showToast("Cart reset.");
+      warningBanner.classList.remove("show");
+    }
+
+    function switchTycoon(id){
+      const next = tycoons.find(t => t.id === id);
+      if(!next) return;
+      currentTycoon = next;
+      resetCart(false);
+      renderTycoons();
+      renderProfile();
+      render();
+      showToast(`${next.name} selected.`);
+    }
+
+    function renderTycoons(){
+      tycoonRow.innerHTML = "";
+      tycoons.forEach(t => {
+        const btn = document.createElement("button");
+        btn.className = "tycoon-btn" + (t.id === currentTycoon.id ? " active" : "");
+        btn.innerHTML = `
+          <div class="tycoon-name">${t.emoji} ${t.name}</div>
+          <div class="tycoon-worth">${fmt(t.worth)}</div>
+        `;
+        btn.addEventListener("click", () => switchTycoon(t.id));
+        tycoonRow.appendChild(btn);
+      });
+    }
+
+    function renderProfile(){
+      avatar.textContent = currentTycoon.emoji;
+      profileName.textContent = currentTycoon.name;
+      profileBio.textContent = currentTycoon.bio;
+      profileWorth.textContent = `Net worth: ${fmt(currentTycoon.worth)}`;
+    }
+
+    function renderShop(){
+      shopGrid.innerHTML = "";
+      items.forEach(item => {
+        const qty = cart[item.id] || 0;
+        const card = document.createElement("article");
+        card.className = "item-card";
+        card.innerHTML = `
+          <div class="item-top">
+            <div class="item-icon">${item.icon}</div>
+            <div class="qty-pill" aria-label="${qty} owned">${qty}</div>
+          </div>
+          <div class="item-body">
+            <h3 class="item-name">${item.name}</h3>
+            <p class="item-desc">${item.desc}</p>
+            <div class="price">${fmt(item.price)}</div>
+            <div class="controls">
+              <button class="btn btn-danger btn-icon" data-action="sell" data-id="${item.id}" ${qty === 0 ? "disabled" : ""}>−</button>
+              <button class="btn btn-main" data-action="buy" data-id="${item.id}" ${canBuy(item) ? "" : "disabled"}>Buy</button>
+              <button class="btn btn-ghost btn-icon" data-action="buy" data-id="${item.id}" ${canBuy(item) ? "" : "disabled"}>+</button>
+            </div>
+          </div>
+        `;
+        shopGrid.appendChild(card);
+      });
+    }
+
+    function renderReceipt(){
+      const purchased = items
+        .filter(item => cart[item.id] > 0)
+        .sort((a,b) => (cart[b.id] * b.price) - (cart[a.id] * a.price));
+
+      if(!purchased.length){
+        receiptBody.innerHTML = `
+          <div class="empty-state">
+            Nothing purchased yet.<br />
+            Start clicking <strong>Buy</strong> on something wildly unnecessary.
+          </div>
+        `;
+        return;
+      }
+
+      receiptBody.innerHTML = purchased.map(item => {
+        const qty = cart[item.id];
+        const total = qty * item.price;
+        return `
+          <div class="line-item">
+            <div>
+              <strong>${item.icon} ${item.name}</strong>
+              <small>${qty} × ${fmt(item.price)}</small>
+            </div>
+            <div class="line-total">${fmt(total)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderStats(){
+      const spent = getSpent();
+      const remaining = getRemaining();
+      const count = getCount();
+      const percent = ((spent / currentTycoon.worth) * 100) || 0;
+
+      remainingDisplay.textContent = fmt(remaining);
+      spentDisplay.textContent = fmt(spent);
+      countDisplay.textContent = count.toLocaleString("en-US");
+      percentDisplay.textContent = percent.toFixed(2) + "%";
+      footerSpent.textContent = fmt(spent);
+      footerRemaining.textContent = fmt(remaining);
+      progressBar.style.width = Math.min(percent, 100) + "%";
+
+      if(remaining === 0){
+        warningBanner.textContent = "You spent the entire fortune. Outstandingly irresponsible work.";
+        warningBanner.classList.add("show");
+        moneyRain();
+      } else if (remaining < currentTycoon.worth * 0.01) {
+        warningBanner.textContent = "Less than 1% remains. You are deep into elite-level spending.";
+        warningBanner.classList.add("show");
+      }
+    }
+
+    function render(){
+      renderShop();
+      renderReceipt();
+      renderStats();
+    }
+
+    shopGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+      const id = Number(btn.dataset.id);
+      const action = btn.dataset.action;
+      if(action === "buy") buyItem(id);
+      if(action === "sell") sellItem(id);
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => resetCart(true));
+
+    document.getElementById("randomBuyBtn").addEventListener("click", () => {
+      const affordable = items.filter(item => canBuy(item));
+      if(!affordable.length){
+        showToast("Nothing affordable remains.");
+        return;
+      }
+      const pick = affordable[Math.floor(Math.random() * affordable.length)];
+      buyItem(pick.id);
+      showToast(`Random buy: ${pick.name}`);
+    });
+
+    renderTycoons();
+    renderProfile();
+    render();
+  </script>
+</body>
+</html>
